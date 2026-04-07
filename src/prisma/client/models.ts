@@ -8,6 +8,6 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/ExchangeRate.js'
-export type * from './models/Sources.js'
-export type * from './commonInputTypes.js'
+export type * from './models/ExchangeRate'
+export type * from './models/Sources'
+export type * from './commonInputTypes'
