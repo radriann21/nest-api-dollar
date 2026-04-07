@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Trend {
+  UP
+  DOWN
+  STABLE
+}
+
+model ExchangeRate {
+  id Int @id @default(autoincrement())
+  price Decimal @db.Decimal(10, 2)
+
+  sourceId Int
+  source Sources @relation(fields: [sourceId], references: [id])
+
+  trend Trend
+  variantion Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Sources {
+  id Int @id @default(autoincrement())
+  name String
+  isActive Boolean @default(true)
+  lastPrice Decimal? @db.Decimal(18, 4)
+  weight Float @default(1.0)
+  exchangeRates ExchangeRate[]
+}
