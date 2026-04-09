@@ -9,6 +9,7 @@ import { RatesModule } from './rates/rates.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
+import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import KeyvRedis from '@keyv/redis';
       useFactory: (configService: ConfigService) => {
         return {
           stores: [new KeyvRedis(configService.get<string>('REDIS_URL'))],
+          ttl: 14400000,
         };
       },
       isGlobal: true,
@@ -48,6 +50,7 @@ import KeyvRedis from '@keyv/redis';
   controllers: [AppController],
   providers: [
     AppService,
+    PrismaService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

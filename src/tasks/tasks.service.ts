@@ -2,21 +2,31 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  Inject,
+  OnModuleInit,
 } from '@nestjs/common';
 import { ScrapperService } from 'src/scrapper/scrapper.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 // Permite ejecutar tareas programadas
 @Injectable()
-export class TasksService {
+export class TasksService implements OnModuleInit {
   private readonly logger = new Logger(TasksService.name);
 
   constructor(
     private readonly scrapperService: ScrapperService,
     private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
     this.logger.log('TasksService initialized');
+  }
+
+  async onModuleInit() {
+    await this.getBCVPrice();
+    await this.getAPIPriceAndData();
   }
 
   @Cron(CronExpression.EVERY_4_HOURS)
@@ -93,6 +103,14 @@ export class TasksService {
           variantion: variation,
         },
       });
+
+      if (source.toUpperCase() === 'BCV') {
+        await this.cacheManager.set('last-bcv-rate', { price });
+      } else if (source.toUpperCase() === 'BINANCE') {
+        await this.cacheManager.set('last-binance-rate', { price });
+      }
+
+      await this.cacheManager.del('last-rates');
 
       this.logger.log('Precio guardado exitosamente');
     } catch (err) {
