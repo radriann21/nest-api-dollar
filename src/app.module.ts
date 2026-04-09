@@ -2,14 +2,25 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TasksModule } from './tasks/tasks.module';
 import { ScrapperModule } from './scrapper/scrapper.module';
 import { RatesModule } from './rates/rates.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { CacheModule } from '@nestjs/cache-manager';
+import KeyvRedis from '@keyv/redis';
 
 @Module({
   imports: [
+    CacheModule.registerAsync({
+      useFactory: (configService: ConfigService) => {
+        return {
+          stores: [new KeyvRedis(configService.get<string>('REDIS_URL'))],
+        };
+      },
+      isGlobal: true,
+      inject: [ConfigService],
+    }),
     ThrottlerModule.forRoot({
       throttlers: [
         {
