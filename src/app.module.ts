@@ -8,8 +8,9 @@ import { ScrapperModule } from './scrapper/scrapper.module';
 import { RatesModule } from './rates/rates.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { CacheModule } from '@nestjs/cache-manager';
-import KeyvRedis from '@keyv/redis';
 import { PrismaService } from './prisma/prisma.service';
+import { AnaliticsModule } from './analitics/analitics.module';
+import KeyvRedis from '@keyv/redis';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { PrismaService } from './prisma/prisma.service';
     TasksModule,
     ScrapperModule,
     RatesModule,
+    AnaliticsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -43,7 +43,7 @@ export class TasksService implements OnModuleInit {
     }
   }
 
-  @Cron(CronExpression.EVERY_4_HOURS)
+  @Cron(CronExpression.EVERY_2_HOURS)
   async getAPIPriceAndData() {
     try {
       const price = await this.scrapperService.APIRequest();
